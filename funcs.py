@@ -235,8 +235,7 @@ def getTimestocsv(dset, func, low, k, label):
     with open(f'results/{label}.csv', 'w') as file:
         write = csv.writer(file)
         for i in out:
-            write.writerow(i)
-        
+            write.writerow(i)     
     
 def create_plot(dset, c1, c2, num, name, xlab, ylab):    
     xt = getx(dset)
@@ -247,10 +246,10 @@ def create_plot(dset, c1, c2, num, name, xlab, ylab):
     
     poly = PolynomialFeatures(degree=4, include_bias=False)
 
-    #reshape data to work properly with sklearn
+    #reshape data
     poly_features = poly.fit_transform(x.reshape(-1, 1))
 
-    #fit polynomial regression model
+    #fit poly reg model
     poly_reg_model = LinearRegression()
     poly_reg_model.fit(poly_features, y)
     y_predicted = poly_reg_model.predict(poly_features)
@@ -260,20 +259,21 @@ def create_plot(dset, c1, c2, num, name, xlab, ylab):
     plt.xlabel(xlab)
     plt.ylabel(ylab)
     plt.legend(loc ="upper left")
-    # plt.yticks(np.arange(0, 0.5, 0.02))
-    # plt.bar(x, y, color=c2)
     f.show()
-
 
 #* Proofs and Misc research
 def mean_proof():
-    data = load_sdev_data(100)
-    plot_withoutreg(data[0], 'red', 'green', 1, 'Median', 'Number of elements', 'Value')
-    plot_withoutreg(data[1], 'blue', 'yellow', 1, 'Mean', 'Number of elements', 'Value')
+    load = load_data(100)
+    means = []
+    medians = []
+    for i in range(1, len(load)):
+        means.append([i, statistics.mean(load[i])])
+        medians.append([i, statistics.median(load[i])])
+    plot_withoutreg(medians, 'red', 'green', 1, 'Median', 'Number of elements', 'Value')
+    plot_withoutreg(means, 'blue', 'yellow', 1, 'Mean', 'Number of elements', 'Value')
     plt.show()
 
 def threshold(size):
-    #! With static arrays
     data = [(load_data(size))[size-1]]
     k = []
     for i in range(5,101):
@@ -281,12 +281,36 @@ def threshold(size):
     out = []
     for i in k:
         st = timer()
-        hybrid(data[0], 0, len(data) - 1, i)
+        hybrid(data[0], 0, len(data) - 1, 1, k, 0)
         ed = timer()
         out.append([i, (ed - st)])
     for i in range(0,10):
         out.pop(i)
     return out
+
+def plot_threshold():
+    data = threshold(5000)
+    xt = getx(data)
+    yt = gety(data)
+
+    x = np.array(xt)
+    y = np.array(yt)
+
+    poly = PolynomialFeatures(degree=2, include_bias=False)
+
+    #reshape data
+    poly_features = poly.fit_transform(x.reshape(-1, 1))
+
+    #fit poly reg model
+    poly_reg_model = LinearRegression()
+    poly_reg_model.fit(poly_features, y)
+    y_predicted = poly_reg_model.predict(poly_features)
+    plt.plot(x, y_predicted, label='Hybrid', color='blue')
+    plt.xlabel('Threshold value')
+    plt.ylabel('Execution time')
+    plt.legend(loc ="upper left")
+    plt.show()
+    
     
 def avg_threshold(size):
     mins=[]
@@ -300,10 +324,10 @@ def avg_threshold(size):
 
         poly = PolynomialFeatures(degree=2, include_bias=False)
 
-        #reshape data to work properly with sklearn
+        #reshape data
         poly_features = poly.fit_transform(x.reshape(-1, 1))
 
-        #fit polynomial regression model
+        #fit poly reg model
         poly_reg_model = LinearRegression()
         poly_reg_model.fit(poly_features, y)
         y_predicted = poly_reg_model.predict(poly_features)
@@ -352,6 +376,5 @@ def growthRates(function, name, color, num):
     plt.ylabel("Space used (bytes)")
     plt.legend(loc ="upper left")
     plt.xticks(np.arange(1000, 11000, 1000))
-    # plt.yticks(np.arange(1000, 11000, 1000))
     f = plt.figure(num)
     f.show()

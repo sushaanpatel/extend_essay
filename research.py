@@ -3,7 +3,6 @@ from funcs import *
 from threading import Thread
 sys.setrecursionlimit(10**6)
 deets = [[quicksort, "Quick", "red"], [bubbleSort, "Bubble", "black"], [hybrid, "Hybrid", "purple"], [InsertionSort, "Insertion", "blue"]]
-# deets = [[InsertionSort, "Insertion", "blue"]]
 
 def CreateData(size):
     load_data_tocsv(size, k_sorted, 3)
@@ -18,7 +17,6 @@ def CollectTime():
 
 
     #*Collecting timing data
-    # det = [[quicksort, "Quick", "red"]]
     for i in deets:
         if i[0] == bubbleSort:
             th3 = Thread(target = getTimestocsv, args=(bsort, i[0], 0, 62, f"{i[1]}_bsort"))
@@ -83,9 +81,6 @@ def comb_eval():
             create_plot(d2, "blue", '', i+1, f'{deets[1][1]} Sort for {datats[i][1]} dataset', 'Number of elements', 'Time')
             create_plot(d3, "red", '', i+1, f'{deets[2][1]} Sort for {datats[i][1]} dataset', 'Number of elements', 'Time')
             create_plot(d4, "purple", '', i+1, f'{deets[3][1]} Sort for {datats[i][1]} dataset', 'Number of elements', 'Time')
-            
     plt.show()
     
-comb_eval()
-
-
+plot_threshold()
